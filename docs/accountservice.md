@@ -20,7 +20,7 @@ Header sind daher nicht explizit erwähnt
 - Request
   - GET /customers
 - Responses
-  - 200 OK
+  - 200
     - Body: Liste der Kundendaten ohne Bezahldaten
 
 ### Einzelnen Kunden auslesen
@@ -28,64 +28,56 @@ Header sind daher nicht explizit erwähnt
 - Request
     - GET /customers/{id}
 - Responses
-  - 200 OK
+  - 200
     - Body: Kundendaten des Kunden ohne Bezahldaten
   - 404 - wenn Kunde mit dieser ID nicht existiert
   - 400 - wenn ID keine Zahl ist
 
 ### Kunde anlegen
 
-REQ
-POST
-/customers
-Body: Customer-Objekt
-RESP
-Erfolgsfall:
-201 CREATED + Location-Header
-Body: angelegtes Customer-Objekt inkl. ids
-Fehlerfälle
-400 Bad Request:
-Body: Error-Objekt mit Hinweisen
-Wann
-Kunde (Name, Vorname, Datum, E-Mail Adresse) bereits vorhanden
-Syntax falsch
-409 CONFLICT
-Body: Error-Objekt mit Hinweisen
-Wann
-E-Mail-Adresse existiert bereits
-<Kunde überschreiben>
-REQ
-PUT
-/customers/{id}
-Body: Customer-Object
-RESP
-Erfolgsfall:
-200 OK
-Body: Kundendaten ohne Bezahldaten
-Fehlerfall:
-404 - not found with id
-400
-<Kunde löschen>
-REQ
-DELETE
-/customers/{ID}
-RESP
-Erfolgsfall:
-204 No Content
-Fehlerfall:
-400 - false ID
-404 - ID not found
+- Request
+  - POST /customers
+  - Body: Customer ohne ID
+- Responses
+  - 201
+    - Location-Header
+    - Body: Customer mit ID
+  - 400 - Validierungs/Syntaxfehler (u.a. Emailadresse bereits vorhanden)
+    
+### Kunde überschreiben
 
+- Request
+  - PUT /customers/{id}
+  - Body: Customer ohne ID
+- Responses
+  - 200
+    - Body: Customer mit ID
+  - 404 - Kunde mit ID nicht gefunden
+  - 400 - Validierungs/Syntaxfehler (u.a. Emailadresse bereits vorhanden, ID ist keine Zahl)
 
-Spezialfälle:
-(De-)Aktivieren eines Kunden-Accounts
-- Customer(state) -> PATCH /customers/{id}
-- POST /customers/{id}/actions/deactivation
-  POST /customers/{id}/actions/activation
-- PUT /customers/{id}/flags/deactivation
-  DELETE ...
-  GET
-  Kreditkarte/Paypal zuweisen (je 1x)
+### Kunde löschen
+
+- Request
+  - DELETE /customers/{id}
+- Responses
+  - 204 (kein Body)
+  - 404 - Kunde mit ID nicht gefunden
+  - 400 - ID ist keine Zahl
+
+### Spezialfälle:
+
+#### (De-)Aktivieren eines Kunden-Accounts
+- einfache Lösung: Status als Teil des Schemas
+  - Customer(state) -> PATCH /customers/{id}
+- Aktivitätsressource
+  - POST /customers/{id}/actions/deactivation
+  - POST /customers/{id}/actions/activation
+- Flag
+  - PUT /customers/{id}/flags/deactivation
+  - DELETE /customers/{id}/flags/deactivation
+  - GET /customers/{id}/flags/deactivation
+
+  - Kreditkarte/Paypal zuweisen (je 1x)
 - Customer(paypal, cc) -> PATCH /customers/{id}
 - PUT /customers/{id}/payments/paypal
 - PUT /customers/{id}/payments/credit-card

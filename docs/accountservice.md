@@ -67,7 +67,8 @@ Header sind daher nicht explizit erwähnt
 ### Spezialfälle:
 
 #### (De-)Aktivieren eines Kunden-Accounts
-- einfache Lösung: Status als Teil des Schemas
+
+- Einfache Lösung: Status als Teil des Schemas
   - Customer(state) -> PATCH /customers/{id}
 - Aktivitätsressource
   - POST /customers/{id}/actions/deactivation
@@ -77,21 +78,30 @@ Header sind daher nicht explizit erwähnt
   - DELETE /customers/{id}/flags/deactivation
   - GET /customers/{id}/flags/deactivation
 
-  - Kreditkarte/Paypal zuweisen (je 1x)
-- Customer(paypal, cc) -> PATCH /customers/{id}
-- PUT /customers/{id}/payments/paypal
-- PUT /customers/{id}/payments/credit-card
-  Herausfinden, ob Kundenaccount aktiviert ist
-  Kunde mit Adresse vs. Addresse als Subressource
-  Kunden auslesen mit 1Mio Datensätzen?
-- GET /customers?start= .... & limit= ... / OData
-  Kunden mit und ohne Bezahldaten auslesen?
-- GET /customers -> Kunden ohne Bezahldaten
-  GET /customers/1/payments
-  GET /customers/2/payments
-  ....
-- GET /customers-with-payments
-  GET /customers?include-payments
-  Semantik von PUT "/customers" ? -> Bulk Operations
+#### Kreditkarte/Paypal zuweisen (je 1x)
+- Einfache Lösung: Teil des Schemas
+  - Customer(paypal, cc) -> PATCH /customers/{id}
+- Subressourcen
+  - PUT /customers/{id}/payments/paypal
+  - PUT /customers/{id}/payments/credit-card
+  - GET /customers/{id}/payments (alle Bezahldaten abfragen)
+  - GET /customers/{id}/payments/paypal
 
+#### Kunden auslesen mit 1Mio Datensätzen?
+- Paginierung, Filtern...
+- GET /customers?start= .... & limit= ...
+- [Zalando Guidelines](https://opensource.zalando.com/restful-api-guidelines/#pagination)
 
+#### Kunden mit und ohne Bezahldaten auslesen?
+- Lösung mit separater Ressource
+  - saubere Trennung der Schemas
+  - GET /customers-with-payments
+- Lösung ohne separater Ressource
+  - kombnierbar mit Paginierung, Filtern...
+  - POST/PUT mit oder ohne? (keine Trennung der Schemas)
+  - GET /customers?include-payments
+
+#### Bulk Operations
+
+- POST/PUT/DELETE /customers?
+- [Artikel](https://www.mscharhag.com/api-design/bulk-and-batch-operations)

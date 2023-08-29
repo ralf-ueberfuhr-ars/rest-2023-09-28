@@ -10,6 +10,9 @@ tags:
     description: Manage PayPal and creditcard data
 servers:
   - url: http://localhost:8080/api/v1
+security:
+  - openId:
+      - reader_access
 paths:
   /customers:
     get:
@@ -29,6 +32,9 @@ paths:
       tags:
         - customers
       summary: Create a customer
+      security:
+        - openId:
+            - writer_access
       requestBody:
         content:
           application/json:
@@ -49,6 +55,8 @@ paths:
                 $ref: '#/components/schemas/Customer'
         '400':
           description: Customer is invalid
+        '403':
+          description: User does not have writer access.
   /customers/{id}:
     get:
       tags:
@@ -276,3 +284,7 @@ components:
       schema:
         type: string
         format: uuid
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://<keycloak-server>/.well-known/openid-configuration

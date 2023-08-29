@@ -97,7 +97,7 @@ Header sind daher nicht explizit erwähnt
   - saubere Trennung der Schemas
   - GET /customers-with-payments
 - Lösung ohne separater Ressource
-  - kombnierbar mit Paginierung, Filtern...
+  - kombinierbar mit Paginierung, Filtern...
   - POST/PUT mit oder ohne? (keine Trennung der Schemas)
   - GET /customers?include-payments
 
